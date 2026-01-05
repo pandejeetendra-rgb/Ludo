@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cyber Ludo Quiz (Model B) — Learner vs Computer</title>
+<style>
+  :root{
+    --bg1:#0b1020;
+    --bg2:#0b2a55;
+    --card: rgba(255,255,255,.08);
+    --card2: rgba(255,255,255,.12);
+    --stroke: rgba(255,255,255,.18);
+    --text:#f7fbff;
+    --muted: rgba(247,251,255,.75);
+
+    --p1:#34d399;   /* learner */
+    --p2:#fb7185;   /* computer */
+    --accent:#60a5fa;
+
+    --cell1:#101a3a;
+    --cell2:#12224b;
+    --safe:#fbbf24;
+
+    --ok:#22c55e;
+    --bad:#ef4444;
+
+    --shadow: 0 12px 35px rgba(0,0,0,.35);
+    --radius: 18px;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color:var(--text);
+    min-height:100vh;
+    background:
+      radial-gradient(1200px 700px at 15% 10%, rgba(96,165,250,.35), transparent 60%),
+      radial-gradient(900px 700px at 85% 20%, rgba(52,211,153,.25), transparent 55%),
+      radial-gradient(900px 700px at 80% 90%, rgba(251,113,133,.22), transparent 60%),
+      linear-gradient(160deg, var(--bg1), var(--bg2));
+  }
+
+  .wrap{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 18px;
+    display:grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 980px){
+    .wrap{grid-template-columns:1fr; padding:14px;}
+  }
+
+  .topbar{
+    grid-column: 1 / -1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding: 12px 14px;
+    border:1px solid var(--stroke);
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+    box-shadow: var(--shadow);
+  }
+
+  .brand{
+    display:flex; align-items:center; gap:10px;
+  }
+  .logo{
+    width:38px; height:38px; border-radius:12px;
+    background:
+      radial-gradient(circle at 30% 35%, rgba(255,255,255,.55), transparent 45%),
+      linear-gradient(135deg, rgba(96,165,250,.9), rgba(52,211,153,.9));
+    box-shadow: 0 10px 20px rgba(0,0,0,.25);
+  }
+  .brand h1{
+    font-size: 16px; margin:0; line-height:1.2;
+    letter-spacing:.2px;
+  }
+  .brand p{
+    margin:2px 0 0; font-size: 12px; color: var(--muted);
+  }
+
+  .actions{
+    display:flex; gap:10px; flex-wrap:wrap;
+    align-items:center; justify-content:flex-end;
+  }
+
+  button{
+    border: 1px solid var(--stroke);
+    background: rgba(255,255,255,.10);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 14px;
+    cursor:pointer;
+    transition: transform .08s ease, background .15s ease, border-color .15s ease;
+    font-weight: 650;
+    letter-spacing:.15px;
+  }
+  button:hover{ background: rgba(255,255,255,.14); }
+  button:active{ transform: scale(.98); }
+  button.primary{
+    border-color: rgba(96,165,250,.55);
+    background: linear-gradient(180deg, rgba(96,165,250,.30), rgba(96,165,250,.18));
+  }
+  button.good{
+    border-color: rgba(34,197,94,.55);
+    background: linear-gradient(180deg, rgba(34,197,94,.25), rgba(34,197,94,.12));
+  }
+  button.danger{
+    border-color: rgba(239,68,68,.55);
+    background: linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.10));
+  }
+  button:disabled{
+    opacity:.55; cursor:not-allowed;
+  }
+
+  .card{
+    border:1px solid var(--stroke);
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .card .hd{
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.10);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .card .hd .ttl{ font-weight: 800; letter-spacing:.2px; }
+  .card .hd .sub{ font-size:12px; color:var(--muted); }
+  .card .bd{ padding: 14px; }
+
+  /* Board */
+  .boardWrap{
+    display:flex; gap:14px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+
+  .board{
+    width: min(520px, 100%);
+    aspect-ratio: 1 / 1;
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,.20);
+    background:
+      radial-gradient(circle at 35% 35%, rgba(255,255,255,.08), transparent 55%),
+      radial-gradient(circle at 70% 75%, rgba(255,255,255,.06), transparent 55%),
+      linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    padding: 14px;
+    position: relative;
+  }
+
+  .track{
+    width:100%;
+    height:100%;
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    gap: 8px;
+  }
+
+  .cell{
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: linear-gradient(180deg, rgba(16,26,58,.9), rgba(18,34,75,.9));
+    position: relative;
+    overflow:hidden;
+  }
+
+  .cell::after{
+    content:"";
+    position:absolute; inset:-1px;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,.10), transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(255,255,255,.06), transparent 55%);
+    pointer-events:none;
+  }
+
+  .cell.safe{
+    border-color: rgba(251,191,36,.55);
+    background:
+      radial-gradient(circle at 30% 30%, rgba(251,191,36,.20), transparent 60%),
+      linear-gradient(180deg, rgba(251,191,36,.15), rgba(16,26,58,.85));
+  }
+
+  .cell.start{
+    border-color: rgba(96,165,250,.55);
+    background:
+      radial-gradient(circle at 35% 30%, rgba(96,165,250,.22), transparent 60%),
+      linear-gradient(180deg, rgba(96,165,250,.18), rgba(16,26,58,.85));
+  }
+
+  .cell.finish{
+    border-color: rgba(34,197,94,.60);
+    background:
+      radial-gradient(circle at 35% 30%, rgba(34,197,94,.22), transparent 60%),
+      linear-gradient(180deg, rgba(34,197,94,.16), rgba(16,26,58,.85));
+  }
+
+  .badge{
+    position:absolute; top:8px; left:8px;
+    font-size: 11px;
+    color: rgba(247,251,255,.80);
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.18);
+    backdrop-filter: blur(6px);
+    z-index: 2;
+  }
+
+  .tokens{
+    position:absolute; right:8px; bottom:8px;
+    display:flex; gap:6px;
+    z-index: 3;
+  }
+
+  .token{
+    width: 20px; height: 20px;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,.85);
+    box-shadow: 0 10px 20px rgba(0,0,0,.30);
+    position: relative;
+  }
+  .token::after{
+    content:"";
+    position:absolute; inset:3px;
+    border-radius: 6px;
+    background: rgba(255,255,255,.18);
+    mix-blend-mode: screen;
+  }
+  .t1{ background: linear-gradient(135deg, rgba(52,211,153,.95), rgba(16,185,129,.85)); }
+  .t2{ background: linear-gradient(135deg, rgba(251,113,133,.95), rgba(244,63,94,.85)); }
+
+  .legend{
+    flex: 1 1 250px;
+    display:grid;
+    gap: 12px;
+    min-width: 240px;
+  }
+  .statRow{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .pill{
+    border:1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.07);
+    border-radius: 16px;
+    padding: 10px 12px;
+  }
+  .pill .k{ font-size:12px; color: var(--muted); }
+  .pill .v{ font-size: 16px; font-weight: 850; margin-top: 2px; }
+
+  .progressBar{
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.14);
+    overflow:hidden;
+  }
+  .bar{
+    height:100%;
+    width:0%;
+    background: linear-gradient(90deg, rgba(96,165,250,.9), rgba(52,211,153,.9));
+  }
+
+  /* Quiz */
+  .qText{
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.35;
+    margin: 0 0 12px;
+  }
+  .optGrid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .optBtn{
+    text-align:left;
+    font-weight: 750;
+    padding: 12px 12px;
+    border-radius: 16px;
+    background: rgba(255,255,255,.08);
+  }
+  .optBtn .lab{
+    display:inline-flex;
+    width: 30px; height: 30px;
+    align-items:center; justify-content:center;
+    border-radius: 12px;
+    margin-right: 10px;
+    font-weight: 900;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(0,0,0,.18);
+  }
+  .optBtn:hover{ background: rgba(255,255,255,.12); }
+
+  .note{
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Dice */
+  .diceBox{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.10);
+  }
+  .dice{
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.22), rgba(255,255,255,.07));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 22px;
+    font-weight: 950;
+    box-shadow: 0 12px 24px rgba(0,0,0,.28);
+    user-select:none;
+  }
+  .dice small{
+    position:absolute;
+    opacity:.0;
+  }
+
+  /* Toast / Popup */
+  .overlay{
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding: 18px;
+    z-index: 999;
+  }
+  .modal{
+    width: min(620px, 100%);
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.08));
+    box-shadow: 0 18px 50px rgba(0,0,0,.45);
+    overflow:hidden;
+  }
+  .modal .mhd{
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.10);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .modal .mhd .mt{ font-weight: 950; }
+  .modal .mbd{ padding: 16px; color: rgba(247,251,255,.92); }
+  .kbd{
+    display:grid; gap: 10px;
+    margin-top: 10px;
+  }
+  .kbd div{
+    padding: 10px 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.18);
+    color: rgba(247,251,255,.92);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .bigPop{
+    position: fixed;
+    left: 50%;
+    top: 14%;
+    transform: translateX(-50%);
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.22);
+    background: rgba(0,0,0,.30);
+    backdrop-filter: blur(8px);
+    font-weight: 950;
+    letter-spacing:.3px;
+    display:none;
+    z-index: 998;
+    box-shadow: 0 18px 45px rgba(0,0,0,.35);
+  }
+  .bigPop.ok{ color: rgba(34,197,94,.95); }
+  .bigPop.bad{ color: rgba(239,68,68,.95); }
+
+  .shake{
+    animation: shake .25s linear 1;
+  }
+  @keyframes shake{
+    0%{ transform: translate(0,0); }
+    20%{ transform: translate(-5px, 2px); }
+    40%{ transform: translate(4px, -3px); }
+    60%{ transform: translate(-3px, 1px); }
+    80%{ transform: translate(3px, 2px); }
+    100%{ transform: translate(0,0); }
+  }
+
+  /* Small help text on board */
+  .cornerTag{
+    position:absolute;
+    left: 14px;
+    bottom: 14px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.18);
+    color: rgba(247,251,255,.88);
+    font-size: 12px;
+    max-width: 65%;
+  }
+
+  a.inline{
+    color: rgba(96,165,250,.95);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(96,165,250,.45);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap" id="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Cyber Ludo Quiz (Model B)</h1>
+          <p>Learner moves on correct answers • Computer moves only when learner is wrong</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="btnHow">How to Play</button>
+        <button id="btnRestart" class="danger">Restart</button>
+      </div>
+    </div>
+
+    <!-- LEFT: Board -->
+    <div class="card">
+      <div class="hd">
+        <div>
+          <div class="ttl">Game Board</div>
+          <div class="sub">Race to “Home” using knowledge, not luck.</div>
+        </div>
+        <div style="text-align:right">
+          <div class="sub">Computer step on wrong:</div>
+          <div class="ttl" id="compStepLabel">+2</div>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="boardWrap">
+          <div class="board" id="board">
+            <div class="track" id="track"></div>
+            <div class="cornerTag">
+              Tip: Your token moves only if your answer is correct. The computer moves only when you answer wrong.
+            </div>
+          </div>
+
+          <div class="legend">
+            <div class="statRow">
+              <div class="pill">
+                <div class="k">Learner Position</div>
+                <div class="v"><span style="color:var(--p1)">●</span> <span id="p1Pos">0</span> / <span id="maxPos">0</span></div>
+              </div>
+              <div class="pill">
+                <div class="k">Computer Position</div>
+                <div class="v"><span style="color:var(--p2)">●</span> <span id="p2Pos">0</span> / <span id="maxPos2">0</span></div>
+              </div>
+            </div>
+
+            <div class="pill">
+              <div class="k">Progress</div>
+              <div class="progressBar" aria-label="progress"><div class="bar" id="bar"></div></div>
+              <div class="note" style="margin-top:8px">
+                Questions answered: <b id="qDone">0</b> / <b id="qTotal">0</b> • Correct: <b id="qCorrect">0</b>
+              </div>
+            </div>
+
+            <div class="pill">
+              <div class="k">Dice (roll happens only after correct answer)</div>
+              <div class="diceBox">
+                <div class="dice" id="dice">—</div>
+                <div class="note" style="flex:1">
+                  Correct → roll & move.<br/>
+                  Wrong → computer moves +2.
+                </div>
+              </div>
+            </div>
+
+            <div class="pill">
+              <div class="k">Status</div>
+              <div class="v" id="statusText" style="font-size:15px; font-weight:850;">
+                Answer the question to start.
+              </div>
+              <div class="note" id="statusSub" style="margin-top:6px;">
+                Keep accuracy high to stay ahead.
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Quiz -->
+    <div class="card">
+      <div class="hd">
+        <div>
+          <div class="ttl">Weekly Quiz Turn</div>
+          <div class="sub">One question per turn. No retries for the same question.</div>
+        </div>
+        <button class="good" id="btnSkip" title="Optional: move to next question without movement">Skip (No Move)</button>
+      </div>
+      <div class="bd">
+        <p class="qText" id="qText">Loading…</p>
+        <div class="optGrid" id="opts"></div>
+
+        <div class="note" style="margin-top: 12px;">
+          <b>Research-safe design:</b> The opponent never answers questions. It only moves when you answer incorrectly (Model B).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bigPop" id="bigPop"></div>
+
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="mhd">
+        <div class="mt" id="modalTitle">How to Play</div>
+        <button id="btnClose">Close</button>
+      </div>
+      <div class="mbd" id="modalBody"></div>
+    </div>
+  </div>
+
+<script>
+/* ============================
+   Cyber Ludo Quiz — Model B
+   Learner vs Computer
+   - Learner moves only on correct.
+   - Computer moves +2 on incorrect.
+   Colorful, mobile friendly, single-file.
+============================ */
+
+(() => {
+  // ---------- CONFIG ----------
+  const COMPUTER_STEP_ON_WRONG = 2;    // Model B constraint: keep <= 2 (recommended)
+  const SAFE_INDICES = new Set([3, 7, 11, 15, 19]); // just visual "safe" squares
+
+  // Track mapping on a 7x7 grid (24 cells around the perimeter-ish, but with nicer spacing).
+  // These are positions in a 7x7 grid (row-major index). We'll render 49 cells but only activate a subset as track.
+  // This keeps it "board-like" while staying simple.
+  const TRACK_GRID_INDEX = [
+    2,3,4,5,6,      // top row (slightly inset)
+    13,20,27,34,41, // right column
+    46,45,44,43,42, // bottom row
+    35,28,21,14,7,  // left column
+    8,9,10,11       // inner top-left run to close shape
+  ];
+  const TRACK_LEN = TRACK_GRID_INDEX.length;
+  const FINISH_INDEX = TRACK_LEN - 1;
+
+  // --- Questions (replace with your chapter-based questions) ---
+  // Keep these short, unambiguous. Balance correct options A/B/C/D.
+  const QUESTIONS = [
+    { q:"Which option best describes 'CIA triad' in cyber security?", opts:["Confidentiality, Integrity, Availability","Control, Identity, Access","Cipher, Integrity, Authentication","Compliance, Inspection, Authorization"], a:0, fb:"CIA triad stands for Confidentiality, Integrity, and Availability."},
+    { q:"A strong password policy should primarily enforce:", opts:["Short passwords for easier recall","Complexity and length with uniqueness","Same password across services","Only numeric passwords"], a:1, fb:"Length + complexity + uniqueness are key for better password strength."},
+    { q:"Phishing is mainly an attack that targets:", opts:["Hardware performance","Human trust and behavior","Wireless signal strength","Database indexing"], a:1, fb:"Phishing exploits social engineering to trick users into revealing information."},
+    { q:"Which is an example of two-factor authentication (2FA)?", opts:["Password only","PIN only","Password + OTP on phone","Security questions only"], a:2, fb:"2FA uses two different factors, e.g., something you know + something you have."},
+    { q:"A firewall is primarily used to:", opts:["Encrypt files","Filter network traffic","Repair corrupted disks","Improve CPU speed"], a:1, fb:"Firewalls allow/deny traffic based on defined security rules."},
+    { q:"Malware that locks files and demands payment is called:", opts:["Spyware","Ransomware","Adware","Rootkit"], a:1, fb:"Ransomware encrypts or locks data and asks for a ransom."},
+    { q:"HTTPS mainly provides:", opts:["Faster browsing","Encrypted communication via TLS","Unlimited bandwidth","Automatic virus removal"], a:1, fb:"HTTPS uses TLS to encrypt data in transit and protect integrity."},
+    { q:"Which is a common sign of a phishing email?", opts:["Clear sender domain and expected context","Urgent threat + suspicious link","No attachments ever","Always signed by IT"], a:1, fb:"Phishing often uses urgency and malicious links to trick users."},
+    { q:"The principle of least privilege means:", opts:["Give admin access to everyone","Give minimum access needed","Give access based on seniority","Give access for convenience"], a:1, fb:"Users should only have permissions required to perform their tasks."},
+    { q:"A 'data breach' means:", opts:["Data is compressed","Unauthorized access or disclosure of data","Data is backed up","Data is deleted intentionally"], a:1, fb:"A breach is unauthorized exposure/access to sensitive information."}
+  ];
+
+  // ---------- STATE ----------
+  let idxOrder = [];
+  let qIndex = 0;
+  let answered = 0;
+  let correct = 0;
+
+  let p1 = 0; // learner position on track
+  let p2 = 0; // computer position on track
+  let locked = false;
+  let gameOver = false;
+
+  // ---------- DOM ----------
+  const app = document.getElementById("app");
+  const trackEl = document.getElementById("track");
+  const p1PosEl = document.getElementById("p1Pos");
+  const p2PosEl = document.getElementById("p2Pos");
+  const maxPosEl = document.getElementById("maxPos");
+  const maxPos2El = document.getElementById("maxPos2");
+  const barEl = document.getElementById("bar");
+  const qDoneEl = document.getElementById("qDone");
+  const qTotalEl = document.getElementById("qTotal");
+  const qCorrectEl = document.getElementById("qCorrect");
+  const statusTextEl = document.getElementById("statusText");
+  const statusSubEl = document.getElementById("statusSub");
+  const diceEl = document.getElementById("dice");
+  const compStepLabelEl = document.getElementById("compStepLabel");
+
+  const qTextEl = document.getElementById("qText");
+  const optsEl = document.getElementById("opts");
+
+  const overlay = document.getElementById("overlay");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalBody = document.getElementById("modalBody");
+  const bigPop = document.getElementById("bigPop");
+
+  // Buttons
+  document.getElementById("btnHow").addEventListener("click", () => showHow());
+  document.getElementById("btnClose").addEventListener("click", () => hideModal());
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) hideModal(); });
+  document.getElementById("btnRestart").addEventListener("click", () => restart());
+  document.getElementById("btnSkip").addEventListener("click", () => {
+    if (locked || gameOver) return;
+    popNeutral("Skipped (no movement)");
+    advanceQuestion();
+  });
+
+  // ---------- INIT ----------
+  compStepLabelEl.textContent = `+${COMPUTER_STEP_ON_WRONG}`;
+  maxPosEl.textContent = FINISH_INDEX;
+  maxPos2El.textContent = FINISH_INDEX;
+  qTotalEl.textContent = QUESTIONS.length;
+
+  buildBoard();
+  restart();
+
+  // ---------- FUNCTIONS ----------
+  function buildBoard(){
+    trackEl.innerHTML = "";
+    // 7x7 = 49 cells
+    for(let i=0;i<49;i++){
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.dataset.grid = String(i);
+
+      // Is this cell part of track?
+      const tpos = TRACK_GRID_INDEX.indexOf(i);
+      if (tpos !== -1){
+        cell.dataset.track = String(tpos);
+
+        // Visual tags
+        if (tpos === 0) cell.classList.add("start");
+        if (tpos === FINISH_INDEX) cell.classList.add("finish");
+        if (SAFE_INDICES.has(tpos)) cell.classList.add("safe");
+
+        const badge = document.createElement("div");
+        badge.className = "badge";
+        badge.textContent = (tpos === 0) ? "START" : (tpos === FINISH_INDEX) ? "HOME" : `#${tpos}`;
+        cell.appendChild(badge);
+
+        const tokens = document.createElement("div");
+        tokens.className = "tokens";
+        tokens.innerHTML = `
+          <div class="token t1" style="display:none" aria-label="Learner token"></div>
+          <div class="token t2" style="display:none" aria-label="Computer token"></div>
+        `;
+        cell.appendChild(tokens);
+      }
+
+      trackEl.appendChild(cell);
+    }
+  }
+
+  function restart(){
+    // shuffle question order each run (optional)
+    idxOrder = Array.from({length: QUESTIONS.length}, (_,i)=>i);
+    shuffle(idxOrder);
+
+    qIndex = 0;
+    answered = 0;
+    correct = 0;
+
+    p1 = 0;
+    p2 = 0;
+    locked = false;
+    gameOver = false;
+
+    diceEl.textContent = "—";
+    updateStats();
+    renderTokens();
+    setStatus("Answer the question to start.", "Correct → you roll & move. Wrong → computer moves +2.");
+    renderQuestion();
+  }
+
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  function renderTokens(){
+    // hide all tokens
+    document.querySelectorAll(".cell[data-track] .token").forEach(t => t.style.display="none");
+
+    const p1Cell = getTrackCell(p1);
+    const p2Cell = getTrackCell(p2);
+
+    if (p1Cell){
+      p1Cell.querySelector(".t1").style.display = "inline-block";
+    }
+    if (p2Cell){
+      p2Cell.querySelector(".t2").style.display = "inline-block";
+    }
+  }
+
+  function getTrackCell(trackPos){
+    const gridIndex = TRACK_GRID_INDEX[trackPos];
+    return document.querySelector(`.cell[data-grid="${gridIndex}"]`);
+  }
+
+  function updateStats(){
+    p1PosEl.textContent = p1;
+    p2PosEl.textContent = p2;
+
+    qDoneEl.textContent = answered;
+    qCorrectEl.textContent = correct;
+
+    const pct = QUESTIONS.length ? Math.round((answered / QUESTIONS.length)*100) : 0;
+    barEl.style.width = `${pct}%`;
+  }
+
+  function renderQuestion(){
+    if (qIndex >= idxOrder.length){
+      endByQuestions();
+      return;
+    }
+
+    const Q = QUESTIONS[idxOrder[qIndex]];
+    qTextEl.textContent = `Q${answered + 1}. ${Q.q}`;
+    optsEl.innerHTML = "";
+
+    const letters = ["A","B","C","D"];
+    Q.opts.forEach((txt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "optBtn";
+      btn.innerHTML = `<span class="lab">${letters[i]}</span><span>${escapeHtml(txt)}</span>`;
+      btn.addEventListener("click", () => choose(i));
+      optsEl.appendChild(btn);
+    });
+  }
+
+  function choose(i){
+    if (locked || gameOver) return;
+    locked = true;
+
+    const Q = QUESTIONS[idxOrder[qIndex]];
+    const isCorrect = (i === Q.a);
+
+    answered += 1;
+
+    if (isCorrect){
+      correct += 1;
+      popOK("Correct!");
+      // Correct: roll dice and move learner
+      const roll = rollDiceAnimated(() => {
+        movePlayer(1, roll);
+        showFeedback(true, Q.fb, () => {
+          checkEnd();
+          if (!gameOver) advanceQuestion();
+        });
+      });
+    } else {
+      popBad("Wrong!");
+      // Wrong: tiny shake + move computer by fixed step
+      app.classList.remove("shake");
+      void app.offsetWidth; // restart animation
+      app.classList.add("shake");
+
+      movePlayer(2, COMPUTER_STEP_ON_WRONG);
+
+      const correctLetter = ["A","B","C","D"][Q.a];
+      const correctText = Q.opts[Q.a];
+
+      showFeedback(false,
+        `Correct answer: <b>${correctLetter}</b> — ${escapeHtml(correctText)}<br/><br/>${escapeHtml(Q.fb)}`,
+        () => {
+          checkEnd();
+          if (!gameOver) advanceQuestion();
+        }
+      );
+      diceEl.textContent = "—";
+    }
+
+    updateStats();
+    renderTokens();
+  }
+
+  function rollDiceAnimated(onDone){
+    // roll now, animate quickly, then finalize
+    const final = 1 + Math.floor(Math.random()*6);
+    let ticks = 0;
+    const timer = setInterval(() => {
+      ticks++;
+      diceEl.textContent = String(1 + Math.floor(Math.random()*6));
+      if (ticks >= 10){
+        clearInterval(timer);
+        diceEl.textContent = String(final);
+        if (typeof onDone === "function") onDone();
+      }
+    }, 60);
+    return final;
+  }
+
+  function movePlayer(which, steps){
+    if (which === 1){
+      p1 = Math.min(FINISH_INDEX, p1 + steps);
+      setStatus(
+        "Nice! You moved ahead.",
+        `You advanced by ${steps}. Keep going.`
+      );
+    } else {
+      p2 = Math.min(FINISH_INDEX, p2 + steps);
+      setStatus(
+        "Careful. The system is catching up.",
+        `Computer advanced by ${steps} because of a wrong answer.`
+      );
+    }
+    renderTokens();
+    updateStats();
+  }
+
+  function advanceQuestion(){
+    qIndex += 1;
+    locked = false;
+    renderQuestion();
+  }
+
+  function checkEnd(){
+    if (p1 >= FINISH_INDEX){
+      gameOver = true;
+      showModal(
+        "You reached Home 🎉",
+        `
+          <div class="note">
+            Great job. You reached Home first.
+          </div>
+          <div class="kbd">
+            <div><b>Your score:</b> ${correct} / ${QUESTIONS.length}</div>
+            <div><b>Note:</b> The computer never answers questions. It only moves when you answer incorrectly (Model B).</div>
+          </div>
+        `
+      );
+      locked = true;
+      return;
+    }
+
+    if (p2 >= FINISH_INDEX){
+      gameOver = true;
+      showModal(
+        "System reached Home",
+        `
+          <div class="note">
+            The system token reached Home first. This is <b>not a failure</b>. Your learning score is shown below.
+          </div>
+          <div class="kbd">
+            <div><b>Your score:</b> ${correct} / ${QUESTIONS.length}</div>
+            <div>Try again and focus on accuracy. You will stay ahead.</div>
+          </div>
+        `
+      );
+      locked = true;
+      return;
+    }
+  }
+
+  function endByQuestions(){
+    gameOver = true;
+    const acc = QUESTIONS.length ? Math.round((correct/QUESTIONS.length)*100) : 0;
+
+    // Optional: knowledge-based completion
+    const pass = acc >= 60;
+
+    showModal(
+      "Quiz Finished",
+      `
+        <div class="note">
+          You completed all questions. Board race is motivational; your learning score is primary.
+        </div>
+        <div class="kbd">
+          <div><b>Correct:</b> ${correct} / ${QUESTIONS.length} (${acc}%)</div>
+          <div><b>Status:</b> ${pass ? `<span style="color:rgba(34,197,94,.95);font-weight:900;">Good mastery</span>` :
+                                   `<span style="color:rgba(251,191,36,.95);font-weight:900;">Needs revision</span>`}
+          </div>
+          <div>You can restart to practice again.</div>
+        </div>
+      `
+    );
+    locked = true;
+  }
+
+  function setStatus(t, s){
+    statusTextEl.textContent = t;
+    statusSubEl.textContent = s;
+  }
+
+  // ---------- MODALS ----------
+  function showHow(){
+    showModal(
+      "How to Play",
+      `
+        <div class="note">
+          This is <b>Model B</b>: computer moves only when you answer incorrectly. It does not answer questions.
+        </div>
+
+        <div class="kbd">
+          <div><b>Step 1:</b> Read the MCQ and choose an option.</div>
+          <div><b>If correct:</b> Dice rolls automatically and your token moves forward.</div>
+          <div><b>If wrong:</b> Your token stays, and the computer token moves <b>+${COMPUTER_STEP_ON_WRONG}</b>.</div>
+          <div><b>Goal:</b> Reach <b>HOME</b> before the system token by keeping accuracy high.</div>
+        </div>
+
+        <div class="note" style="margin-top:10px">
+          Tip: If you want to “pause” without movement, use <b>Skip (No Move)</b>. It advances to the next question.
+        </div>
+      `
+    );
+  }
+
+  function showFeedback(isCorrect, html, onNext){
+    const title = isCorrect ? "Correct ✅" : "Wrong ❌";
+    const body = `
+      <div class="note">${html}</div>
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+        <button class="primary" id="nextBtn">${gameOver ? "Close" : "Continue"}</button>
+      </div>
+    `;
+    showModal(title, body);
+
+    // hook next
+    setTimeout(() => {
+      const nextBtn = document.getElementById("nextBtn");
+      if (nextBtn){
+        nextBtn.addEventListener("click", () => {
+          hideModal();
+          if (typeof onNext === "function") onNext();
+          locked = false;
+        });
+      }
+    }, 0);
+  }
+
+  function showModal(title, html){
+    modalTitle.textContent = title;
+    modalBody.innerHTML = html;
+    overlay.style.display = "flex";
+  }
+  function hideModal(){
+    overlay.style.display = "none";
+  }
+
+  // ---------- POPUPS ----------
+  function popOK(txt){ showPop(txt, "ok"); }
+  function popBad(txt){ showPop(txt, "bad"); }
+  function popNeutral(txt){
+    bigPop.className = "bigPop";
+    bigPop.textContent = txt;
+    bigPop.style.display = "block";
+    setTimeout(() => bigPop.style.display="none", 850);
+  }
+  function showPop(txt, cls){
+    bigPop.className = `bigPop ${cls}`;
+    bigPop.textContent = txt;
+    bigPop.style.display = "block";
+    setTimeout(() => bigPop.style.display="none", 650);
+  }
+
+  // ---------- UTIL ----------
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+})();
+</script>
+</body>
+</html>
