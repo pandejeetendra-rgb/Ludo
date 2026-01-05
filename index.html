@@ -6,27 +6,20 @@
 <title>Social Media Security — Cyber Ludo Quiz (Model B)</title>
 <style>
   :root{
-    --bg1:#0b1020;
-    --bg2:#0b2a55;
-    --card: rgba(255,255,255,.08);
-    --card2: rgba(255,255,255,.12);
+    --bg1:#0b1020; --bg2:#0b2a55;
     --stroke: rgba(255,255,255,.18);
-    --text:#f7fbff;
-    --muted: rgba(247,251,255,.75);
+    --text:#f7fbff; --muted: rgba(247,251,255,.75);
 
     --p1:#34d399;   /* learner */
     --p2:#fb7185;   /* computer */
     --accent:#60a5fa;
 
-    --cell1:#101a3a;
-    --cell2:#12224b;
-    --safe:#fbbf24;
-
-    --ok:#22c55e;
-    --bad:#ef4444;
-
+    --ok:#22c55e; --bad:#ef4444;
     --shadow: 0 12px 35px rgba(0,0,0,.35);
     --radius: 18px;
+
+    --cellA: rgba(16,26,58,.92);
+    --cellB: rgba(18,34,75,.92);
   }
 
   *{box-sizing:border-box}
@@ -50,16 +43,13 @@
     grid-template-columns: 1.1fr .9fr;
     gap: 16px;
   }
-
   @media (max-width: 980px){
     .wrap{grid-template-columns:1fr; padding:14px;}
   }
 
   .topbar{
     grid-column: 1 / -1;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    display:flex; align-items:center; justify-content:space-between;
     gap:12px;
     padding: 12px 14px;
     border:1px solid var(--stroke);
@@ -89,7 +79,7 @@
     border-radius: 14px;
     cursor:pointer;
     transition: transform .08s ease, background .15s ease, border-color .15s ease;
-    font-weight: 650;
+    font-weight: 700;
     letter-spacing:.15px;
   }
   button:hover{ background: rgba(255,255,255,.14); }
@@ -120,10 +110,11 @@
     border-bottom: 1px solid rgba(255,255,255,.10);
     display:flex; align-items:center; justify-content:space-between; gap:10px;
   }
-  .card .hd .ttl{ font-weight: 800; letter-spacing:.2px; }
+  .card .hd .ttl{ font-weight: 900; letter-spacing:.2px; }
   .card .hd .sub{ font-size:12px; color:var(--muted); }
   .card .bd{ padding: 14px; }
 
+  /* Board */
   .boardWrap{ display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; }
 
   .board{
@@ -152,7 +143,7 @@
   .cell{
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,.10);
-    background: linear-gradient(180deg, rgba(16,26,58,.9), rgba(18,34,75,.9));
+    background: linear-gradient(180deg, var(--cellA), var(--cellB));
     position: relative;
     overflow:hidden;
   }
@@ -169,21 +160,19 @@
     border-color: rgba(251,191,36,.55);
     background:
       radial-gradient(circle at 30% 30%, rgba(251,191,36,.20), transparent 60%),
-      linear-gradient(180deg, rgba(251,191,36,.15), rgba(16,26,58,.85));
+      linear-gradient(180deg, rgba(251,191,36,.15), var(--cellA));
   }
-
   .cell.start{
     border-color: rgba(96,165,250,.55);
     background:
       radial-gradient(circle at 35% 30%, rgba(96,165,250,.22), transparent 60%),
-      linear-gradient(180deg, rgba(96,165,250,.18), rgba(16,26,58,.85));
+      linear-gradient(180deg, rgba(96,165,250,.18), var(--cellA));
   }
-
   .cell.finish{
     border-color: rgba(34,197,94,.60);
     background:
       radial-gradient(circle at 35% 30%, rgba(34,197,94,.22), transparent 60%),
-      linear-gradient(180deg, rgba(34,197,94,.16), rgba(16,26,58,.85));
+      linear-gradient(180deg, rgba(34,197,94,.16), var(--cellA));
   }
 
   .badge{
@@ -221,9 +210,18 @@
   .t1{ background: linear-gradient(135deg, rgba(52,211,153,.95), rgba(16,185,129,.85)); }
   .t2{ background: linear-gradient(135deg, rgba(251,113,133,.95), rgba(244,63,94,.85)); }
 
+  /* Step-by-step movement highlight + hop */
+  .glowP1{ box-shadow: 0 0 0 2px rgba(52,211,153,.25), 0 0 18px rgba(52,211,153,.35) inset; }
+  .glowP2{ box-shadow: 0 0 0 2px rgba(251,113,133,.22), 0 0 18px rgba(251,113,133,.32) inset; }
+  .hop{ animation: hop .18s ease-out 1; }
+  @keyframes hop{
+    0%{ transform: translateY(0) scale(1); }
+    50%{ transform: translateY(-6px) scale(1.05); }
+    100%{ transform: translateY(0) scale(1); }
+  }
+
   .legend{ flex: 1 1 250px; display:grid; gap: 12px; min-width: 240px; }
   .statRow{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
   .pill{
     border:1px solid rgba(255,255,255,.14);
     background: rgba(255,255,255,.07);
@@ -231,27 +229,25 @@
     padding: 10px 12px;
   }
   .pill .k{ font-size:12px; color: var(--muted); }
-  .pill .v{ font-size: 16px; font-weight: 850; margin-top: 2px; }
+  .pill .v{ font-size: 16px; font-weight: 900; margin-top: 2px; }
 
   .progressBar{
-    height: 12px;
-    border-radius: 999px;
+    height: 12px; border-radius: 999px;
     background: rgba(255,255,255,.10);
     border: 1px solid rgba(255,255,255,.14);
     overflow:hidden;
   }
   .bar{ height:100%; width:0%; background: linear-gradient(90deg, rgba(96,165,250,.9), rgba(52,211,153,.9)); }
 
+  /* Quiz */
   .qText{
-    font-size: 16px;
-    font-weight: 800;
-    line-height: 1.35;
-    margin: 0 0 12px;
+    font-size: 16px; font-weight: 900;
+    line-height: 1.35; margin: 0 0 12px;
   }
   .optGrid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
   .optBtn{
     text-align:left;
-    font-weight: 750;
+    font-weight: 800;
     padding: 12px 12px;
     border-radius: 16px;
     background: rgba(255,255,255,.08);
@@ -262,7 +258,7 @@
     align-items:center; justify-content:center;
     border-radius: 12px;
     margin-right: 10px;
-    font-weight: 900;
+    font-weight: 950;
     border: 1px solid rgba(255,255,255,.18);
     background: rgba(0,0,0,.18);
   }
@@ -270,36 +266,40 @@
 
   .note{ font-size: 12px; color: var(--muted); line-height: 1.5; }
 
+  /* Dice */
   .diceBox{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    display:flex; align-items:center; justify-content:space-between;
     gap: 10px;
-    margin-top: 12px;
-    padding-top: 12px;
+    margin-top: 12px; padding-top: 12px;
     border-top: 1px solid rgba(255,255,255,.10);
   }
   .dice{
-    width: 54px;
-    height: 54px;
+    width: 54px; height: 54px;
     border-radius: 16px;
     border: 1px solid rgba(255,255,255,.18);
     background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.22), rgba(255,255,255,.07));
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size: 22px;
-    font-weight: 950;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 22px; font-weight: 950;
     box-shadow: 0 12px 24px rgba(0,0,0,.28);
     user-select:none;
+    position: relative;
+  }
+  .dice.rolling{
+    animation: diceRoll .35s linear infinite;
+    box-shadow: 0 16px 30px rgba(0,0,0,.32), 0 0 0 2px rgba(96,165,250,.15);
+  }
+  @keyframes diceRoll{
+    0%{ transform: rotate(0deg) scale(1); }
+    50%{ transform: rotate(180deg) scale(1.04); }
+    100%{ transform: rotate(360deg) scale(1); }
   }
 
+  /* Popup + modal */
   .overlay{
     position: fixed; inset: 0;
     background: rgba(0,0,0,.55);
     display:none;
-    align-items:center;
-    justify-content:center;
+    align-items:center; justify-content:center;
     padding: 18px;
     z-index: 999;
   }
@@ -314,10 +314,7 @@
   .modal .mhd{
     padding: 14px 16px;
     border-bottom: 1px solid rgba(255,255,255,.10);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
   }
   .modal .mhd .mt{ font-weight: 950; }
   .modal .mbd{ padding: 16px; color: rgba(247,251,255,.92); }
@@ -334,19 +331,15 @@
   }
 
   .bigPop{
-    position: fixed;
-    left: 50%;
-    top: 14%;
+    position: fixed; left: 50%; top: 14%;
     transform: translateX(-50%);
     padding: 12px 18px;
     border-radius: 999px;
     border: 1px solid rgba(255,255,255,.22);
     background: rgba(0,0,0,.30);
     backdrop-filter: blur(8px);
-    font-weight: 950;
-    letter-spacing:.3px;
-    display:none;
-    z-index: 998;
+    font-weight: 950; letter-spacing:.3px;
+    display:none; z-index: 998;
     box-shadow: 0 18px 45px rgba(0,0,0,.35);
   }
   .bigPop.ok{ color: rgba(34,197,94,.95); }
@@ -363,16 +356,14 @@
   }
 
   .cornerTag{
-    position:absolute;
-    left: 14px;
-    bottom: 14px;
+    position:absolute; left: 14px; bottom: 14px;
     padding: 8px 10px;
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,.14);
     background: rgba(0,0,0,.18);
     color: rgba(247,251,255,.88);
     font-size: 12px;
-    max-width: 68%;
+    max-width: 70%;
   }
 </style>
 </head>
@@ -383,7 +374,7 @@
         <div class="logo" aria-hidden="true"></div>
         <div>
           <h1>Social Media Security — Cyber Ludo Quiz (Model B)</h1>
-          <p>Learner moves on correct answers • Computer moves only when learner is wrong</p>
+          <p>Correct → roll & move • Wrong → computer moves +2 • Computer never answers</p>
         </div>
       </div>
       <div class="actions">
@@ -396,7 +387,7 @@
       <div class="hd">
         <div>
           <div class="ttl">Game Board</div>
-          <div class="sub">Race to “Home” using safe social media practices.</div>
+          <div class="sub">Step-by-step movement animation added (dice + tokens).</div>
         </div>
         <div style="text-align:right">
           <div class="sub">Computer step on wrong:</div>
@@ -408,7 +399,7 @@
           <div class="board" id="board">
             <div class="track" id="track"></div>
             <div class="cornerTag">
-              Tip: Correct → you move. Wrong → computer moves +2. No luck-based opponent.
+              Tip: If you answer wrong, the computer advances. Keep accuracy high to stay ahead.
             </div>
           </div>
 
@@ -426,32 +417,32 @@
 
             <div class="pill">
               <div class="k">Progress</div>
-              <div class="progressBar" aria-label="progress"><div class="bar" id="bar"></div></div>
+              <div class="progressBar"><div class="bar" id="bar"></div></div>
               <div class="note" style="margin-top:8px">
                 Questions answered: <b id="qDone">0</b> / <b id="qTotal">0</b> • Correct: <b id="qCorrect">0</b>
               </div>
             </div>
 
             <div class="pill">
-              <div class="k">Dice (roll happens only after correct answer)</div>
+              <div class="k">Dice</div>
               <div class="diceBox">
                 <div class="dice" id="dice">—</div>
                 <div class="note" style="flex:1">
-                  Correct → roll & move.<br/>
-                  Wrong → computer moves +2.
+                  Dice rolls only after correct answer (so luck never replaces learning).
                 </div>
               </div>
             </div>
 
             <div class="pill">
               <div class="k">Status</div>
-              <div class="v" id="statusText" style="font-size:15px; font-weight:850;">
+              <div class="v" id="statusText" style="font-size:15px; font-weight:900;">
                 Answer the question to start.
               </div>
               <div class="note" id="statusSub" style="margin-top:6px;">
-                Keep accuracy high to stay ahead.
+                Model B: computer moves only when you are wrong.
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -461,7 +452,7 @@
       <div class="hd">
         <div>
           <div class="ttl">Quiz Turn</div>
-          <div class="sub">One question per turn. No retries for the same question.</div>
+          <div class="sub">One question per turn • No retries for the same question.</div>
         </div>
         <button class="good" id="btnSkip" title="Optional: move to next question without movement">Skip (No Move)</button>
       </div>
@@ -470,7 +461,7 @@
         <div class="optGrid" id="opts"></div>
 
         <div class="note" style="margin-top: 12px;">
-          Model B: The computer token never answers questions. It moves only when you answer incorrectly.
+          Question bank is prepared from your uploaded chapters: <b>Social Media Security</b> and <b>Tips for Social Media Security</b>.
         </div>
       </div>
     </div>
@@ -490,12 +481,19 @@
 
 <script>
 (() => {
-  // ============================
-  // CONFIG
-  // ============================
-  const COMPUTER_STEP_ON_WRONG = 2; // Model B constraint (keep <= 2)
-  const SAFE_INDICES = new Set([3, 7, 11, 15, 19]); // only visual
+  /* ============================
+     Cyber Ludo Quiz — Model B
+     - Learner moves only on correct answers.
+     - Computer moves +2 only on learner wrong answers.
+     - Added animations:
+       1) Dice rolling animation
+       2) Step-by-step token movement (hop + highlight per step)
+  ============================ */
 
+  const COMPUTER_STEP_ON_WRONG = 2; // keep <= 2 for low cognitive load
+  const SAFE_INDICES = new Set([3, 7, 11, 15, 19]); // visual only
+
+  // 24-step track in a 7x7 board (simple + neat)
   const TRACK_GRID_INDEX = [
     2,3,4,5,6,
     13,20,27,34,41,
@@ -503,185 +501,160 @@
     35,28,21,14,7,
     8,9,10,11
   ];
-  const TRACK_LEN = TRACK_GRID_INDEX.length;
-  const FINISH_INDEX = TRACK_LEN - 1;
+  const FINISH_INDEX = TRACK_GRID_INDEX.length - 1;
 
   // ============================
-  // QUESTIONS (Derived from uploaded PDFs)
-  // Balanced correct options across A/B/C/D
+  // QUESTIONS (from uploaded chapters)
+  // Balanced correct answers A/B/C/D evenly (5 each)
   // ============================
   const QUESTIONS = [
-    // A (index 0)
-    { q:"Why is it recommended to use https:// when accessing social networking sites?",
-      opts:["It encrypts traffic between your browser and the site","It blocks all ads automatically","It makes your posts invisible to the site owner","It prevents account creation"],
+    // A (0)
+    { q:"Why is using https:// recommended when logging into social networking sites?",
+      opts:["It encrypts traffic between your browser and the site","It blocks all ads automatically","It prevents account creation","It makes your posts invisible to the platform"],
       a:0,
-      fb:"Using https:// adds encryption to protect usernames, passwords, and posted data in transit."
+      fb:"HTTPS encrypts data in transit (like passwords and messages), reducing interception risk."
     },
-    // B (index 1)
-    { q:"On Facebook, what is strongly recommended on the 'Find Your Friends' screen during account setup?",
-      opts:["Enter email password so Facebook can import contacts","Skip providing your email password to Facebook","Upload a profile photo immediately","Join multiple networks to be discoverable"],
+    // B (1)
+    { q:"During Facebook setup, what is the safer choice on the 'Find Your Friends' step?",
+      opts:["Enter your email password so Facebook can import contacts","Skip providing your email password to Facebook","Share your phone contacts publicly","Turn on public search immediately"],
       a:1,
-      fb:"It is strongly recommended to skip giving your email password for contact importing."
+      fb:"Avoid sharing your email password for contact importing."
     },
-    // C (index 2)
-    { q:"Which Facebook security option helps alert you when someone logs in from an unfamiliar device?",
-      opts:["Blocked Users","Restricted List","Login Notifications","Public Search"],
+    // C (2)
+    { q:"Which Facebook feature can alert you if someone logs in from an unfamiliar device?",
+      opts:["Public Search","Privacy Shortcuts","Login Notifications","Friend Suggestions"],
       a:2,
-      fb:"Login Notifications can alert you about logins from devices you have not used before."
+      fb:"Login Notifications can warn you about logins from devices you have not used before."
     },
-    // D (index 3)
-    { q:"In Facebook advertising settings, what setting is recommended for 'Third Party Sites' to reduce exposure?",
-      opts:["Everyone","Friends","Only me","No-one"],
-      a:3,
-      fb:"Setting Third Party Sites to 'No-one' helps reduce sharing/association for third-party ads."
-    },
-
-    // A
-    { q:"If you want only your contacts to see your Facebook status updates, the recommended setting is:",
-      opts:["Friends Only (or a chosen restricted audience)","Public by default","Friends of friends only","Allow search engines to link to your timeline"],
-      a:0,
-      fb:"Use a restricted audience like 'Friends Only' (and remember content can still be copied)."
-    },
-    // B
-    { q:"On Twitter, which option is suggested if you want tweets visible only to approved followers?",
-      opts:["Enable location","Allow photo tagging","Protect Your Tweets","Enable public discovery"],
-      a:2,
-      fb:"Protecting tweets limits visibility to approved followers (though the platform can still access data)."
-    , a:2}, // keep correct index 2; we will fix below to keep balance.
-  ];
-
-  // The above accidental duplicate 'a' would break. We'll rebuild QUESTIONS cleanly below.
-
-})();
-</script>
-
-<script>
-/* ============================
-   FIXED: Build QUESTIONS cleanly (no duplicate keys)
-============================ */
-(() => {
-  const QUESTIONS = [
-    // 1 (A)
-    { q:"Why is it recommended to use https:// when accessing social networking sites?",
-      opts:["It encrypts traffic between your browser and the site","It blocks all ads automatically","It makes your posts invisible to the site owner","It prevents account creation"],
-      a:0,
-      fb:"Using https:// adds encryption to protect usernames, passwords, and posted data in transit."
-    },
-    // 2 (B)
-    { q:"During Facebook account setup, what is strongly recommended on the 'Find Your Friends' step?",
-      opts:["Enter your email password so Facebook can import contacts","Skip providing your email password to Facebook","Upload a profile photo immediately","Join many networks to become discoverable"],
-      a:1,
-      fb:"It is strongly recommended to skip giving your email password for contact importing."
-    },
-    // 3 (C)
-    { q:"Which Facebook security feature can alert you when someone logs in from a device you have not used before?",
-      opts:["Restricted List","Code Generator","Login Notifications","Public Search"],
-      a:2,
-      fb:"Login Notifications can alert you about logins from unfamiliar devices."
-    },
-    // 4 (D)
-    { q:"In Facebook advertising settings, what is recommended for 'Third Party Sites' to reduce future exposure?",
+    // D (3)
+    { q:"To reduce exposure in Facebook advertising settings, a recommended choice for 'Third Party Sites' is:",
       opts:["Everyone","Friends","Only Me","No-one"],
       a:3,
-      fb:"Setting Third Party Sites to 'No-one' helps reduce third-party advertising association."
+      fb:"Setting it to 'No-one' reduces third-party advertising association."
     },
 
-    // 5 (A)
-    { q:"If you want only your contacts to see your Facebook status updates, the recommended default is:",
+    // A (0)
+    { q:"If you want your Facebook status updates visible only to your contacts, choose:",
       opts:["Friends Only (or a restricted audience you choose)","Public (everyone)","Friends of friends","Anyone via search engines"],
       a:0,
-      fb:"Use a restricted audience like 'Friends Only'. Remember content can still be copied or reshared."
+      fb:"Use a restricted audience like 'Friends Only' for routine posts."
     },
-    // 6 (B)
-    { q:"What is the recommended choice for Twitter photo tagging to reduce risk?",
-      opts:["Allow everyone to tag you","Do not allow anyone to tag you in photos","Allow only followers to tag you","Enable tagging suggestions"],
+    // B (1)
+    { q:"What is a safer practice before posting a photo/video of another person?",
+      opts:["Post first and ask later","Get their consent first","Always tag them publicly","Share it only in comments"],
       a:1,
-      fb:"Since approvals may not exist for photo tags, the safer option is to disallow photo tagging."
+      fb:"Consent matters because posts can be copied, reshared, and misunderstood later."
     },
-    // 7 (C)
-    { q:"Which Twitter setting limits who can see your tweets to approved followers only?",
-      opts:["Tweet location","Discoverability","Protect my tweets","Personalisation and promotion"],
+    // C (2)
+    { q:"Which Twitter setting limits tweets so only approved followers can see them?",
+      opts:["Discoverability","Tweet location","Protect your Tweets","Personalization"],
       a:2,
-      fb:"Protecting tweets limits visibility to approved followers (though the platform can still access data)."
+      fb:"Protecting tweets makes your content visible only to approved followers."
     },
-    // 8 (D)
-    { q:"A key risk of integrating multiple social networking accounts (e.g., Twitter auto-posting to Facebook) is:",
-      opts:["It always increases privacy","It forces HTTPS on all sites","It hides your identity everywhere","You may be anonymous on one site but exposed on another"],
+    // D (3)
+    { q:"A key risk of linking/auto-posting between multiple social networks is:",
+      opts:["It guarantees anonymity everywhere","It always improves privacy","It prevents metadata leaks","You may be anonymous on one site but exposed on another"],
       a:3,
-      fb:"Cross-posting can reveal identity across platforms even if you try to stay anonymous on one."
+      fb:"Cross-posting can connect identities across platforms."
     },
 
-    // 9 (A)
-    { q:"Why should you be careful about posting photos/videos online, even when privacy settings are used?",
-      opts:["They can reveal identities and sensitive metadata (date/time/location)","They automatically delete after 24 hours","They cannot be copied by others","They are invisible to platform owners"],
+    // A (0)
+    { q:"Why should you be cautious while sharing photos/videos online (even with privacy settings)?",
+      opts:["They can reveal identities and sensitive details like location/time","They always delete automatically","They cannot be copied by others","They are invisible to service providers"],
       a:0,
-      fb:"Photos/videos can expose identities and hidden metadata like time and location."
+      fb:"Images/videos can leak personal information and may be downloaded or reshared."
     },
-    // 10 (B)
-    { q:"Which is a recommended safe practice before posting a photo or video of another person?",
-      opts:["Tag them publicly","Get their consent first","Share it only in comments","Post it first and ask later"],
+    // B (1)
+    { q:"What is a safer approach to location sharing on social media?",
+      opts:["Enable location on every post","Keep location off unless needed and double-check settings","Share live location publicly during travel","Assume location cannot be inferred without GPS"],
       a:1,
-      fb:"Always get consent before posting photos/videos of others; consider possible repercussions."
+      fb:"Location can reveal routines and real-time presence. Keep it off unless necessary."
     },
-    // 11 (C)
-    { q:"What is a recommended precaution about location sharing on social media?",
-      opts:["Always enable GPS tagging","Share live location in every update","Double-check location settings and keep them disabled unless needed","Location can never be inferred without GPS"],
+    // C (2)
+    { q:"If your browser warns about an invalid security certificate while using webmail, it may indicate:",
+      opts:["Your inbox is full","Your password is too strong","Possible interception/tampering of the connection","Your account is permanently deleted"],
       a:2,
-      fb:"Be mindful of location settings; double-check and keep disabled unless truly needed."
+      fb:"Certificate warnings can signal a man-in-the-middle risk or misconfigured security."
     },
-    // 12 (D)
-    { q:"The guide compares social networking sites to a 'huge party' mainly to highlight that:",
-      opts:["You can trust everyone equally","Only friends can see your content","Privacy settings fully protect you from service owners","You may reveal personal details widely without realizing it"],
+    // D (3)
+    { q:"The chapter compares social networking sites to a 'huge party' mainly to suggest that:",
+      opts:["Only friends can see your content","Privacy settings fully prevent exposure","Everyone at the party is trustworthy","You may reveal personal details widely without realizing it"],
       a:3,
-      fb:"It warns that you might expose personal details to many people without full awareness."
+      fb:"The metaphor highlights unintended oversharing and broad visibility."
     },
 
-    // 13 (A)
-    { q:"Which email practice is recommended to reduce malware risk?",
-      opts:["Do not open unexpected attachments, especially from unknown senders","Open all attachments to check content quickly","Disable antivirus warnings","Forward suspicious attachments to friends"],
+    // A (0)
+    { q:"Which email practice reduces malware risk?",
+      opts:["Avoid unexpected attachments, especially from unknown senders","Open all attachments quickly to check content","Disable antivirus warnings","Forward suspicious attachments to others"],
       a:0,
-      fb:"Unexpected attachments are a common malware route; be cautious and keep antivirus updated."
+      fb:"Unexpected attachments are a common malware route; verify before opening."
     },
-    // 14 (B)
-    { q:"If you want to avoid revealing identity when creating an email account, the guide suggests using:",
-      opts:["Your full legal name as username","Anonymity software such as Tor","The same username everywhere","Only a public/work email address"],
+    // B (1)
+    { q:"To avoid revealing identity when creating an email account, the guide suggests using:",
+      opts:["Your full legal name as username","Anonymity software such as Tor","The same username everywhere","Only your official work email"],
       a:1,
-      fb:"Tor can help hide your connection; avoid usernames tied to personal/professional identity."
+      fb:"Tor can help hide network identity; also avoid usernames linked to your real identity."
     },
-    // 15 (C)
+    // C (2)
     { q:"A common sign of an email scam is:",
-      opts:["A normal update from a known contact","A calendar invite you requested","A message claiming urgent action to 'update account info' or your account will be shut down","A plain-text email with no links"],
-      a:2,
-      fb:"Scam emails often create urgency and ask you to click links or submit account details."
+      opts:["Normal update from a known contact","A message asking urgent action to update account info via a link","A plain email with no links","A receipt for a purchase you made"],
+      a:1, /* This would be B. Fix to C to keep balance by rewriting options */
+      fb:"Scams often use urgency and links to steal credentials."
     },
-    // 16 (D)
-    { q:"If your browser suddenly warns about an invalid security certificate when accessing webmail, it may indicate:",
-      opts:["Your inbox is full","Your password is too strong","The email provider is permanently offline","Possible tampering/interception of the connection"],
+    // D (3)
+    { q:"A safer response if you receive an unexpected password-reset email is:",
+      opts:["Click the link immediately","Reply with your details to confirm","Ignore and continue using the same password","Visit the service by typing the official URL yourself and check account activity"],
       a:3,
-      fb:"Invalid certificate warnings can indicate interception or man-in-the-middle tampering."
+      fb:"Avoid clicking links in suspicious emails; go directly to the official site/app."
+    },
+
+    // A (0)
+    { q:"Why is it risky to use the same password across social platforms?",
+      opts:["One breach can lead to multiple account takeovers (credential reuse)","It prevents password recovery","It forces public posting","It stops you from using HTTPS"],
+      a:0,
+      fb:"If one site is compromised, attackers try the same password elsewhere."
+    },
+    // B (1)
+    { q:"What is a safer setting for photo tagging if you want to reduce risk?",
+      opts:["Allow everyone to tag you","Do not allow photo tagging / restrict it as much as possible","Enable tagging suggestions","Auto-approve all tags"],
+      a:1,
+      fb:"Tagging can expose you and your connections. Restrict or disable if possible."
+    },
+    // C (2)
+    { q:"When installing third-party apps connected to your social accounts, the best first step is to:",
+      opts:["Install quickly and decide later","Grant all permissions to avoid errors","Review permissions and avoid apps requesting unnecessary access","Share the app link with everyone"],
+      a:2,
+      fb:"App permissions can expose data. Avoid apps requesting more access than needed."
+    },
+    // D (3)
+    { q:"A safe practice to limit oversharing on social media is:",
+      opts:["Always keep profiles public","Post travel plans in real time publicly","Share personal identifiers (DOB, address) to build trust","Use privacy settings + think before posting sensitive details"],
+      a:3,
+      fb:"Privacy settings help, but judgment before posting is equally important."
     }
   ];
+
+  // Fix Q15 to keep balance + correctness.
+  // We will replace it with a proper C-correct question to keep A/B/C/D distribution.
+  QUESTIONS[14] = {
+    q:"A common sign of an email scam is:",
+    opts:[
+      "A friendly message that matches an ongoing conversation",
+      "A newsletter you subscribed to from a trusted source",
+      "An urgent warning asking you to click a link and 'verify' or 'update' your account",
+      "A normal reply that contains no links or requests"
+    ],
+    a:2,
+    fb:"Scams often create urgency and push you to click links or submit credentials."
+  };
 
   // ============================
   // STATE
   // ============================
-  const COMPUTER_STEP_ON_WRONG = 2;
-  const SAFE_INDICES = new Set([3, 7, 11, 15, 19]);
-  const TRACK_GRID_INDEX = [
-    2,3,4,5,6,
-    13,20,27,34,41,
-    46,45,44,43,42,
-    35,28,21,14,7,
-    8,9,10,11
-  ];
-  const TRACK_LEN = TRACK_GRID_INDEX.length;
-  const FINISH_INDEX = TRACK_LEN - 1;
-
-  let idxOrder = [];
-  let qIndex = 0;
+  let order = [];
+  let qi = 0;
   let answered = 0;
   let correct = 0;
-
   let p1 = 0;
   let p2 = 0;
   let locked = false;
@@ -713,28 +686,26 @@
   const modalBody = document.getElementById("modalBody");
   const bigPop = document.getElementById("bigPop");
 
-  // Buttons
-  document.getElementById("btnHow").addEventListener("click", () => showHow());
-  document.getElementById("btnClose").addEventListener("click", () => hideModal());
+  document.getElementById("btnHow").addEventListener("click", showHow);
+  document.getElementById("btnClose").addEventListener("click", hideModal);
   overlay.addEventListener("click", (e) => { if (e.target === overlay) hideModal(); });
-  document.getElementById("btnRestart").addEventListener("click", () => restart());
+  document.getElementById("btnRestart").addEventListener("click", restart);
   document.getElementById("btnSkip").addEventListener("click", () => {
     if (locked || gameOver) return;
     popNeutral("Skipped (no movement)");
     advanceQuestion();
   });
 
-  // init labels
   compStepLabelEl.textContent = `+${COMPUTER_STEP_ON_WRONG}`;
-  maxPosEl.textContent = FINISH_INDEX;
-  maxPos2El.textContent = FINISH_INDEX;
-  qTotalEl.textContent = QUESTIONS.length;
+  maxPosEl.textContent = String(TRACK_GRID_INDEX.length - 1);
+  maxPos2El.textContent = String(TRACK_GRID_INDEX.length - 1);
+  qTotalEl.textContent = String(QUESTIONS.length);
 
   buildBoard();
   restart();
 
   // ============================
-  // BOARD
+  // BOARD BUILD
   // ============================
   function buildBoard(){
     trackEl.innerHTML = "";
@@ -748,12 +719,12 @@
         cell.dataset.track = String(tpos);
 
         if (tpos === 0) cell.classList.add("start");
-        if (tpos === FINISH_INDEX) cell.classList.add("finish");
+        if (tpos === TRACK_GRID_INDEX.length - 1) cell.classList.add("finish");
         if (SAFE_INDICES.has(tpos)) cell.classList.add("safe");
 
         const badge = document.createElement("div");
         badge.className = "badge";
-        badge.textContent = (tpos === 0) ? "START" : (tpos === FINISH_INDEX) ? "HOME" : `#${tpos}`;
+        badge.textContent = (tpos === 0) ? "START" : (tpos === TRACK_GRID_INDEX.length - 1) ? "HOME" : `#${tpos}`;
         cell.appendChild(badge);
 
         const tokens = document.createElement("div");
@@ -772,22 +743,22 @@
   // GAME
   // ============================
   function restart(){
-    idxOrder = Array.from({length: QUESTIONS.length}, (_,i)=>i);
-    shuffle(idxOrder);
+    order = Array.from({length: QUESTIONS.length}, (_,i)=>i);
+    shuffle(order);
 
-    qIndex = 0;
+    qi = 0;
     answered = 0;
     correct = 0;
-
-    p1 = 0;
-    p2 = 0;
+    p1 = 0; p2 = 0;
     locked = false;
     gameOver = false;
 
     diceEl.textContent = "—";
+    diceEl.classList.remove("rolling");
+
     updateStats();
     renderTokens();
-    setStatus("Answer the question to start.", "Correct → you roll & move. Wrong → computer moves +2.");
+    setStatus("Answer the question to start.", "Correct → roll & move. Wrong → computer moves +2.");
     renderQuestion();
   }
 
@@ -798,40 +769,40 @@
     }
   }
 
-  function renderTokens(){
-    document.querySelectorAll(".cell[data-track] .token").forEach(t => t.style.display="none");
-    const p1Cell = getTrackCell(p1);
-    const p2Cell = getTrackCell(p2);
-    if (p1Cell) p1Cell.querySelector(".t1").style.display = "inline-block";
-    if (p2Cell) p2Cell.querySelector(".t2").style.display = "inline-block";
-  }
-
-  function getTrackCell(trackPos){
-    const gridIndex = TRACK_GRID_INDEX[trackPos];
+  function getTrackCell(pos){
+    const gridIndex = TRACK_GRID_INDEX[pos];
     return document.querySelector(`.cell[data-grid="${gridIndex}"]`);
   }
 
+  function clearGlows(){
+    document.querySelectorAll(".cell").forEach(c => c.classList.remove("glowP1","glowP2"));
+  }
+
+  function renderTokens(){
+    document.querySelectorAll(".cell[data-track] .token").forEach(t => t.style.display="none");
+    const c1 = getTrackCell(p1);
+    const c2 = getTrackCell(p2);
+    if (c1) c1.querySelector(".t1").style.display = "inline-block";
+    if (c2) c2.querySelector(".t2").style.display = "inline-block";
+  }
+
   function updateStats(){
-    p1PosEl.textContent = p1;
-    p2PosEl.textContent = p2;
-
-    qDoneEl.textContent = answered;
-    qCorrectEl.textContent = correct;
-
+    p1PosEl.textContent = String(p1);
+    p2PosEl.textContent = String(p2);
+    qDoneEl.textContent = String(answered);
+    qCorrectEl.textContent = String(correct);
     const pct = QUESTIONS.length ? Math.round((answered / QUESTIONS.length)*100) : 0;
     barEl.style.width = `${pct}%`;
   }
 
   function renderQuestion(){
-    if (qIndex >= idxOrder.length){
+    if (qi >= order.length){
       endByQuestions();
       return;
     }
-
-    const Q = QUESTIONS[idxOrder[qIndex]];
+    const Q = QUESTIONS[order[qi]];
     qTextEl.textContent = `Q${answered + 1}. ${Q.q}`;
     optsEl.innerHTML = "";
-
     const letters = ["A","B","C","D"];
     Q.opts.forEach((txt, i) => {
       const btn = document.createElement("button");
@@ -842,11 +813,11 @@
     });
   }
 
-  function choose(i){
+  async function choose(i){
     if (locked || gameOver) return;
     locked = true;
 
-    const Q = QUESTIONS[idxOrder[qIndex]];
+    const Q = QUESTIONS[order[qi]];
     const isCorrect = (i === Q.a);
 
     answered += 1;
@@ -854,67 +825,100 @@
     if (isCorrect){
       correct += 1;
       popOK("Correct!");
-      const roll = rollDiceAnimated(() => {
-        movePlayer(1, roll);
-        showFeedback(true, Q.fb, () => {
-          checkEnd();
-          if (!gameOver) advanceQuestion();
-        });
+
+      const roll = await rollDiceAnimated();     // animated dice
+      await movePlayerAnimated(1, roll);         // step-by-step movement
+      showFeedback(true, Q.fb, async () => {
+        checkEnd();
+        if (!gameOver) advanceQuestion();
       });
+
     } else {
       popBad("Wrong!");
-      app.classList.remove("shake");
-      void app.offsetWidth;
-      app.classList.add("shake");
+      app.classList.remove("shake"); void app.offsetWidth; app.classList.add("shake");
 
-      movePlayer(2, COMPUTER_STEP_ON_WRONG);
+      await movePlayerAnimated(2, COMPUTER_STEP_ON_WRONG); // step-by-step movement
 
       const correctLetter = ["A","B","C","D"][Q.a];
       const correctText = Q.opts[Q.a];
-
       showFeedback(false,
         `Correct answer: <b>${correctLetter}</b> — ${escapeHtml(correctText)}<br/><br/>${escapeHtml(Q.fb)}`,
-        () => {
+        async () => {
           checkEnd();
           if (!gameOver) advanceQuestion();
         }
       );
+
       diceEl.textContent = "—";
+      diceEl.classList.remove("rolling");
     }
 
     updateStats();
     renderTokens();
   }
 
-  function rollDiceAnimated(onDone){
-    const final = 1 + Math.floor(Math.random()*6);
+  function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+  async function rollDiceAnimated(){
+    diceEl.classList.add("rolling");
     let ticks = 0;
-    const timer = setInterval(() => {
-      ticks++;
+    while (ticks < 12){
       diceEl.textContent = String(1 + Math.floor(Math.random()*6));
-      if (ticks >= 10){
-        clearInterval(timer);
-        diceEl.textContent = String(final);
-        if (typeof onDone === "function") onDone();
-      }
-    }, 60);
+      await sleep(55);
+      ticks++;
+    }
+    const final = 1 + Math.floor(Math.random()*6);
+    diceEl.textContent = String(final);
+    await sleep(120);
+    diceEl.classList.remove("rolling");
     return final;
   }
 
-  function movePlayer(which, steps){
-    if (which === 1){
-      p1 = Math.min(FINISH_INDEX, p1 + steps);
-      setStatus("Nice! You moved ahead.", `You advanced by ${steps}. Keep going.`);
+  async function movePlayerAnimated(which, steps){
+    // Step-by-step: each step highlights the cell + hops the token
+    const isLearner = (which === 1);
+    const glowClass = isLearner ? "glowP1" : "glowP2";
+
+    if (isLearner){
+      setStatus("Moving ahead…", `You earned ${steps} step(s).`);
     } else {
-      p2 = Math.min(FINISH_INDEX, p2 + steps);
-      setStatus("Careful. The system is catching up.", `Computer advanced by ${steps} because of a wrong answer.`);
+      setStatus("System advances…", `Computer moves ${steps} step(s) due to a wrong answer.`);
     }
-    renderTokens();
-    updateStats();
+
+    for(let s=0; s<steps; s++){
+      if (isLearner) p1 = Math.min(FINISH_INDEX, p1 + 1);
+      else p2 = Math.min(FINISH_INDEX, p2 + 1);
+
+      clearGlows();
+      const cell = getTrackCell(isLearner ? p1 : p2);
+      if (cell) cell.classList.add(glowClass);
+
+      renderTokens();
+      updateStats();
+
+      // hop animation on visible token
+      const token = cell ? cell.querySelector(isLearner ? ".t1" : ".t2") : null;
+      if (token){
+        token.classList.remove("hop");
+        void token.offsetWidth;
+        token.classList.add("hop");
+      }
+
+      await sleep(160);
+
+      if ((isLearner && p1 >= FINISH_INDEX) || (!isLearner && p2 >= FINISH_INDEX)) break;
+    }
+
+    clearGlows();
+    if (isLearner){
+      setStatus("Nice! You moved ahead.", "Keep accuracy high to stay ahead of the system.");
+    } else {
+      setStatus("Careful. The system is catching up.", "Answer carefully to stop the system from advancing.");
+    }
   }
 
   function advanceQuestion(){
-    qIndex += 1;
+    qi += 1;
     locked = false;
     renderQuestion();
   }
@@ -928,7 +932,7 @@
           <div class="note">Great job. You reached Home first.</div>
           <div class="kbd">
             <div><b>Your score:</b> ${correct} / ${QUESTIONS.length}</div>
-            <div><b>Model B note:</b> Computer never answers questions. It moves only on wrong answers.</div>
+            <div><b>Model B:</b> Computer never answers. It moves only when you are wrong.</div>
           </div>
         `
       );
@@ -949,7 +953,6 @@
         `
       );
       locked = true;
-      return;
     }
   }
 
@@ -961,7 +964,7 @@
     showModal(
       "Quiz Finished",
       `
-        <div class="note">You completed all questions. The board race is motivational; your learning score is primary.</div>
+        <div class="note">You completed all questions. Board race is motivational; your learning score is primary.</div>
         <div class="kbd">
           <div><b>Correct:</b> ${correct} / ${QUESTIONS.length} (${acc}%)</div>
           <div><b>Status:</b> ${pass ? `<span style="color:rgba(34,197,94,.95);font-weight:900;">Good mastery</span>` :
@@ -980,23 +983,19 @@
   }
 
   // ============================
-  // MODALS
+  // MODALS + FEEDBACK
   // ============================
   function showHow(){
     showModal(
-      "How to Play",
+      "How to Play (Model B)",
       `
         <div class="note">
-          This is <b>Model B</b>: computer moves only when you answer incorrectly. It does not answer questions.
+          You play against a system token. The system does not answer questions.
         </div>
         <div class="kbd">
-          <div><b>Step 1:</b> Read the MCQ and choose an option.</div>
-          <div><b>If correct:</b> Dice rolls automatically and your token moves forward.</div>
-          <div><b>If wrong:</b> Your token stays, and the computer token moves <b>+${COMPUTER_STEP_ON_WRONG}</b>.</div>
-          <div><b>Goal:</b> Reach <b>HOME</b> before the system token by keeping accuracy high.</div>
-        </div>
-        <div class="note" style="margin-top:10px">
-          Tip: Use <b>Skip (No Move)</b> if you want to move to next question without changing positions.
+          <div><b>Correct:</b> Dice rolls and you move step-by-step.</div>
+          <div><b>Wrong:</b> You do not move, and the system moves <b>+${COMPUTER_STEP_ON_WRONG}</b> step-by-step.</div>
+          <div><b>Goal:</b> Reach <b>HOME</b> before the system by keeping accuracy high.</div>
         </div>
       `
     );
@@ -1015,9 +1014,9 @@
     setTimeout(() => {
       const nextBtn = document.getElementById("nextBtn");
       if (nextBtn){
-        nextBtn.addEventListener("click", () => {
+        nextBtn.addEventListener("click", async () => {
           hideModal();
-          if (typeof onNext === "function") onNext();
+          if (typeof onNext === "function") await onNext();
           locked = false;
         });
       }
