@@ -1,4 +1,4 @@
-```html
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,11 +11,10 @@
     --stroke: rgba(255,255,255,.18);
     --text:#f7fbff; --muted: rgba(247,251,255,.75);
 
-    --p1:#34d399;   /* learner */
-    --p2:#fb7185;   /* computer */
+    --p1:#34d399;
+    --p2:#fb7185;
     --accent:#60a5fa;
 
-    --ok:#22c55e; --bad:#ef4444;
     --shadow: 0 12px 35px rgba(0,0,0,.35);
     --radius: 18px;
 
@@ -115,11 +114,9 @@
   .card .hd .sub{ font-size:12px; color:var(--muted); }
   .card .bd{ padding: 14px; }
 
-  /* Screens (Option 1) */
   .screen{ display:none; }
   .screen.active{ display:block; }
 
-  /* Board */
   .boardWrap{ display:flex; flex-direction: column; gap: 12px; }
   .boardTopInfo{
     display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
@@ -240,7 +237,6 @@
     100%{ transform: translateY(0) scale(1); }
   }
 
-  /* FX layer (trail + sparks) */
   .fxLayer{
     position:absolute;
     inset: 14px;
@@ -279,7 +275,6 @@
     100%{ transform: translate(var(--dx), var(--dy)) scale(.45); opacity:0; }
   }
 
-  /* Dice */
   .diceRow{
     display:flex; align-items:center; gap: 10px; justify-content:space-between;
     flex-wrap:wrap;
@@ -304,7 +299,6 @@
     100%{ transform: rotate(360deg) scale(1); }
   }
 
-  /* Quiz */
   .qText{
     font-size: 16px; font-weight: 950;
     line-height: 1.35; margin: 0 0 12px;
@@ -330,7 +324,6 @@
   .optBtn:hover{ background: rgba(255,255,255,.12); }
   .note{ font-size: 12px; color: var(--muted); line-height: 1.5; }
 
-  /* Popups + modal */
   .overlay{
     position: fixed; inset: 0;
     background: rgba(0,0,0,.55);
@@ -391,7 +384,6 @@
     100%{ transform: translate(0,0); }
   }
 
-  /* Confetti canvas */
   #confetti{
     position: fixed;
     inset: 0;
@@ -412,7 +404,7 @@
         <div class="logo" aria-hidden="true"></div>
         <div style="min-width:0">
           <h1>Cyber Ludo Quiz (Model B) — Mobile Step Mode</h1>
-          <p>MCQ screen → Board animation → next MCQ (better for phones)</p>
+          <p>MCQ screen → Board animation → next MCQ</p>
         </div>
       </div>
       <div class="actions">
@@ -421,7 +413,6 @@
       </div>
     </div>
 
-    <!-- SCREEN 1: MCQ ONLY -->
     <div class="card screen active" id="mcqScreen">
       <div class="hd">
         <div>
@@ -434,20 +425,19 @@
         <p class="qText" id="qText">Loading…</p>
         <div class="optGrid" id="opts"></div>
         <div class="note" style="margin-top:12px">
-          Correct → dice rolls and you move • Wrong → computer moves +2 (computer never answers)
+          Correct → dice rolls and you move • Wrong → computer moves +2
         </div>
       </div>
     </div>
 
-    <!-- SCREEN 2: BOARD ONLY (ANIMATION) -->
     <div class="card screen" id="boardScreen">
       <div class="hd">
         <div>
           <div class="ttl">Board Animation</div>
-          <div class="sub">Watch dice + step-by-step movement.</div>
+          <div class="sub">Enjoy dice + step-by-step movement.</div>
         </div>
         <div class="note" id="animHint" style="font-weight:900;color:rgba(247,251,255,.9);">
-          Moving…
+          Waiting…
         </div>
       </div>
       <div class="bd">
@@ -499,14 +489,11 @@
 
 <script>
 (() => {
-  /* Option 1 implemented:
-     - MCQ screen ONLY
-     - After closing feedback modal -> switch to board screen, run animation
-     - After animation -> switch back to MCQ screen for next question
-  */
-
   const COMPUTER_STEP_ON_WRONG = 2;
   const SAFE_INDICES = new Set([3, 7, 11, 15, 19]);
+
+  // ✅ Your requested delay (enjoy the board before returning to MCQ)
+  const RETURN_TO_MCQ_DELAY_MS = 1800;
 
   const TRACK_GRID_INDEX = [
     2,3,4,5,6,
@@ -517,7 +504,6 @@
   ];
   const FINISH_INDEX = TRACK_GRID_INDEX.length - 1;
 
-  // Same 20 questions used previously (chapter-aligned set)
   const QUESTIONS = [
     { q:"Why is using https:// recommended when logging into social networking sites?",
       opts:["It encrypts traffic between your browser and the site","It blocks all ads automatically","It prevents account creation","It makes your posts invisible to the platform"],
@@ -621,7 +607,6 @@
     }
   ];
 
-  // State
   let order = [];
   let qi = 0;
   let answered = 0;
@@ -630,13 +615,9 @@
   let p2 = 0;
   let locked = false;
   let gameOver = false;
+  let pending = null;
 
-  // “pending” movement after MCQ feedback closes
-  let pending = null; // {type:"correct", roll:n} OR {type:"wrong", steps:n}
-
-  // DOM
   const app = document.getElementById("app");
-
   const mcqScreen = document.getElementById("mcqScreen");
   const boardScreen = document.getElementById("boardScreen");
 
@@ -694,7 +675,6 @@
     }
   }
 
-  // Board build
   function buildBoard(){
     trackEl.innerHTML = "";
     for(let i=0;i<49;i++){
@@ -727,7 +707,6 @@
     }
   }
 
-  // Game
   function restart(){
     order = Array.from({length: QUESTIONS.length}, (_,i)=>i);
     shuffle(order);
@@ -772,6 +751,7 @@
   function clearGlows(){
     document.querySelectorAll(".cell").forEach(c => c.classList.remove("glowP1","glowP2"));
   }
+  function clearFx(){ fxLayer.innerHTML = ""; }
 
   function renderTokens(){
     document.querySelectorAll(".cell[data-track] .token").forEach(t => t.style.display="none");
@@ -817,8 +797,7 @@
     if (isCorrect){
       correct += 1;
       popOK("Correct!");
-      // Roll dice now (still on MCQ screen) but animation will be shown on board screen.
-      const roll = await rollDiceValueOnly(); // calculate roll, no board yet
+      const roll = 1 + Math.floor(Math.random()*6);
       pending = { type:"correct", roll, fb: Q.fb };
       showFeedback(true, Q.fb, () => runPendingAnimationAndAdvance());
     } else {
@@ -828,7 +807,6 @@
       const correctLetter = ["A","B","C","D"][Q.a];
       const correctText = Q.opts[Q.a];
       pending = { type:"wrong", steps: COMPUTER_STEP_ON_WRONG, fb: Q.fb, corr: {letter: correctLetter, text: correctText} };
-
       showFeedback(false,
         `Correct answer: <b>${correctLetter}</b> — ${escapeHtml(correctText)}<br/><br/>${escapeHtml(Q.fb)}`,
         () => runPendingAnimationAndAdvance()
@@ -840,33 +818,21 @@
 
   function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-  // Roll value, animation will be shown later on board screen
-  async function rollDiceValueOnly(){
-    // keep random fair
-    return 1 + Math.floor(Math.random()*6);
-  }
-
-  // When learner closes feedback -> show board screen and animate movement
   async function runPendingAnimationAndAdvance(){
     hideModal();
     if (!pending) { locked = false; return; }
 
-    // Switch to board screen
     showScreen("board");
     clearFx();
     clearGlows();
-
-    // Ensure tokens visible
     renderTokens();
     updateStats();
 
     if (pending.type === "correct"){
-      // dice roll animation on board screen
       animHintEl.textContent = "Correct → rolling dice…";
       statusTextEl.textContent = "Rolling…";
       diceEl.classList.add("rolling");
 
-      // quick roll animation
       let ticks = 0;
       while (ticks < 10){
         diceEl.textContent = String(1 + Math.floor(Math.random()*6));
@@ -874,15 +840,13 @@
         ticks++;
       }
       diceEl.textContent = String(pending.roll);
-      await sleep(120);
+      await sleep(140);
       diceEl.classList.remove("rolling");
 
       animHintEl.textContent = `Moving ${pending.roll} step(s)…`;
       statusTextEl.textContent = `You move ${pending.roll} step(s).`;
       await movePlayerAnimated(1, pending.roll);
-
     } else {
-      // wrong -> computer moves, dice stays —
       diceEl.textContent = "—";
       diceEl.classList.remove("rolling");
       animHintEl.textContent = `Wrong → computer moves +${pending.steps}`;
@@ -890,12 +854,12 @@
       await movePlayerAnimated(2, pending.steps);
     }
 
-    // Check end AFTER animation
     checkEnd();
     if (!gameOver){
-      // brief pause then return to MCQ screen
-      animHintEl.textContent = "Next question…";
-      await sleep(350);
+      animHintEl.textContent = "Enjoy the board…";
+      // ✅ Increased delay to 1800ms (your request)
+      await sleep(RETURN_TO_MCQ_DELAY_MS);
+
       advanceQuestion();
       showScreen("mcq");
       locked = false;
@@ -921,18 +885,12 @@
       renderTokens();
       updateStats();
 
-      // Trail
       if (cell){
         const {x,y} = cellCenterInFxLayer(cell);
         spawnTrail(x, y, trailColor);
-
-        // Spark on safe squares
-        if (SAFE_INDICES.has(posNow)){
-          spawnSpark(x, y);
-        }
+        if (SAFE_INDICES.has(posNow)) spawnSpark(x, y);
       }
 
-      // hop animation
       const token = cell ? cell.querySelector(isLearner ? ".t1" : ".t2") : null;
       if (token){
         token.classList.remove("hop");
@@ -941,17 +899,12 @@
       }
 
       await sleep(170);
-
       if ((isLearner && p1 >= FINISH_INDEX) || (!isLearner && p2 >= FINISH_INDEX)) break;
     }
-
     clearGlows();
   }
 
-  function advanceQuestion(){
-    qi += 1;
-    renderQuestion();
-  }
+  function advanceQuestion(){ qi += 1; renderQuestion(); }
 
   function checkEnd(){
     if (p1 >= FINISH_INDEX){
@@ -976,7 +929,7 @@
       showModal(
         "System reached Home",
         `
-          <div class="note">The system token reached Home first. This is <b>not a failure</b>. Your learning score is below.</div>
+          <div class="note">The system token reached Home first. Your learning score is below.</div>
           <div class="kbd">
             <div><b>Your score:</b> ${correct} / ${QUESTIONS.length}</div>
             <div>Restart and focus on accuracy to stay ahead.</div>
@@ -995,7 +948,7 @@
     showModal(
       "Quiz Finished",
       `
-        <div class="note">You completed all questions. Your accuracy is the main learning score.</div>
+        <div class="note">You completed all questions. Your accuracy is the main score.</div>
         <div class="kbd">
           <div><b>Correct:</b> ${correct} / ${QUESTIONS.length} (${acc}%)</div>
           <div><b>Status:</b> ${pass ? `<span style="color:rgba(34,197,94,.95);font-weight:900;">Good mastery</span>` :
@@ -1008,14 +961,12 @@
     locked = true;
   }
 
-  // MODALS
   function showHow(){
     showModal(
       "How to Play (Mobile Step Mode)",
       `
         <div class="note">
-          This version is optimized for smartphones. You will see one screen at a time:
-          <b>MCQ</b> → <b>Board animation</b> → next <b>MCQ</b>.
+          One screen at a time: <b>MCQ</b> → <b>Board animation</b> → next <b>MCQ</b>.
         </div>
         <div class="kbd">
           <div><b>Correct:</b> Dice rolls and you move step-by-step.</div>
@@ -1052,7 +1003,6 @@
   }
   function hideModal(){ overlay.style.display = "none"; }
 
-  // POPUPS
   function popOK(txt){ showPop(txt, "ok"); }
   function popBad(txt){ showPop(txt, "bad"); }
   function popNeutral(txt){
@@ -1067,9 +1017,6 @@
     bigPop.style.display = "block";
     setTimeout(() => bigPop.style.display="none", 650);
   }
-
-  // FX helpers
-  function clearFx(){ fxLayer.innerHTML = ""; }
 
   function cellCenterInFxLayer(cellEl){
     const fxRect = fxLayer.getBoundingClientRect();
@@ -1114,7 +1061,6 @@
     setTimeout(() => wrap.remove(), 560);
   }
 
-  // Confetti
   function resizeConfettiCanvas(){
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     confettiCanvas.width = Math.floor(window.innerWidth * dpr);
@@ -1187,7 +1133,6 @@
     requestAnimationFrame(tick);
   }
 
-  // UTIL
   function escapeHtml(s){
     return String(s)
       .replaceAll("&","&amp;")
